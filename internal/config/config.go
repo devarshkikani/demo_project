@@ -9,7 +9,7 @@ import (
 )
 
 type HTTPServer struct {
-	Addr string
+	Addr string `yaml:"address" env-required:"true"`
 }
 
 type Config struct {
@@ -32,7 +32,7 @@ func MustLoad() *Config {
 		configPath = *flags
 
 		if configPath == "" {
-			log.Fatal("COnfig path is not set yet")
+			log.Fatal("Config path is not set yet")
 		}
 	}
 

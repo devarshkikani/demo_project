@@ -1,4 +1,4 @@
-module cmd/students-api
+module github.com/devarshkikani/demo_project
 
 go 1.23.6
 
