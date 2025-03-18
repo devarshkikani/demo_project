@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/devarshkikani/demo_project/internal/storage"
 	"github.com/devarshkikani/demo_project/internal/types"
@@ -50,4 +51,25 @@ func New(storage storage.Storage) http.HandlerFunc {
 		response.WriteJson(w, http.StatusCreated, map[string]int64{"id": lastId})
 	}
 
+}
+
+func GetStudentById(storage storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.PathValue("id")
+
+		intId, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(err))
+			return
+		}
+
+		student, errorr := storage.GetStudentById(intId)
+
+		if errorr != nil {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(errorr))
+			return
+		}
+
+		response.WriteJson(w, http.StatusOK, student)
+	}
 }
