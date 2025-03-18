@@ -12,15 +12,24 @@ import (
 
 	"github.com/devarshkikani/demo_project/internal/config"
 	"github.com/devarshkikani/demo_project/internal/http/handlers/student"
+	"github.com/devarshkikani/demo_project/internal/storage/sqlite"
 )
 
 func main() {
 
 	cfg := config.MustLoad()
 
+	storage, err := sqlite.New(cfg)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	slog.Info("Storage initalized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
+
 	router := http.NewServeMux()
 
-	router.HandleFunc("/api/students", student.New())
+	router.HandleFunc("/api/students", student.New(storage))
 
 	server := http.Server{
 		Addr:    cfg.Addr,
