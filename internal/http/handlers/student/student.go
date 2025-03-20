@@ -73,6 +73,7 @@ func GetStudentById(storage storage.Storage) http.HandlerFunc {
 		response.WriteJson(w, http.StatusOK, student)
 	}
 }
+
 func GetList(storage storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -85,4 +86,45 @@ func GetList(storage storage.Storage) http.HandlerFunc {
 
 		response.WriteJson(w, http.StatusOK, students)
 	}
+}
+
+func UpdateStudent(storage storage.Storage) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var student types.Student
+
+		err := json.NewDecoder(r.Body).Decode(&student)
+
+		if errors.Is(err, io.EOF) {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("empty body")))
+			return
+		}
+
+		if student.Id == 0 || student.Name == "" {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("missing required fields")))
+			return
+		}
+
+		if err := validator.New().Struct(student); err != nil {
+			validateErrs := err.(validator.ValidationErrors)
+			response.WriteJson(w, http.StatusBadGateway, response.ValidationError(validateErrs))
+			return
+		}
+
+		lastId, err := storage.UpdateStudentData(
+			student.Id,
+			student.Name,
+			student.Email,
+			student.Age,
+		)
+
+		if err != nil {
+			response.WriteJson(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		response.WriteJson(w, http.StatusCreated, map[string]int64{"id": lastId})
+	}
+
 }

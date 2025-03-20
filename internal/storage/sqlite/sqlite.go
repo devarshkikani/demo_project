@@ -123,3 +123,22 @@ func (s *Sqlite) GetStudents() ([]types.Student, error) {
 
 	return students, nil
 }
+
+func (s *Sqlite) UpdateStudentData(id int64, name string, email string, age int) (int64, error) {
+
+	stmt, err := s.Db.Prepare("UPDATE students SET name = ?, email = ?, age = ? WHERE id = ?")
+
+	if err != nil {
+		return 0, err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(name, email, age, id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
