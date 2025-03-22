@@ -37,6 +37,8 @@ func main() {
 
 	router.HandleFunc("POST /api/students/update", student.UpdateStudent(storage))
 
+	router.HandleFunc("POST /api/students/delete/{id}", student.DeleteStudent(storage))
+
 	server := http.Server{
 		Addr:    cfg.Addr,
 		Handler: router,
